@@ -1,134 +1,359 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hospital Management System - Panel Local</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital Management System</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .inp{width:100%;background:#0f172a;border:1px solid #334155;border-radius:.5rem;padding:.5rem .75rem;font-size:.875rem;color:#f1f5f9}
+  .inp:focus{outline:2px solid #10b981;border-color:transparent}
+  .btn{background:#059669;color:#fff;font-weight:600;font-size:.875rem;padding:.5rem 1rem;border-radius:.5rem}
+  .btn:hover{background:#10b981}.btn:disabled{opacity:.5;cursor:wait}
+  .btn2{background:#1e293b;border:1px solid #334155;color:#cbd5e1;font-size:.875rem;padding:.5rem 1rem;border-radius:.5rem}
+  .btn2:hover{background:#334155}
+  .card{background:#0f172a;border:1px solid #1e293b;border-radius:.75rem;padding:1.25rem}
+  .tab{padding:.5rem .9rem;border-radius:.5rem;font-size:.875rem;font-weight:500;color:#94a3b8;white-space:nowrap}
+  .tab:hover{background:#1e293b;color:#fff}.tab.on{background:#059669;color:#fff}
+  th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#64748b;padding:.6rem .75rem}
+  td{padding:.6rem .75rem;font-size:.875rem;border-top:1px solid #1e293b}
+</style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-<div class="max-w-6xl mx-auto px-4 py-10">
-
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">Hospital Management System</h1>
-    <p class="text-gray-400 text-sm mt-1">
-      Panel unico local &middot; Imagen 3 (Frontend) &rarr; Imagen 2 (Backend, 9 microservicios) &rarr; Imagen 1 (PostgreSQL)
-    </p>
-    <span class="inline-flex items-center gap-2 bg-amber-900/30 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-amber-700/50 mt-3">
-      Stub generado: no se proporciono codigo de frontend en los 5 paquetes recibidos
-    </span>
-  </div>
-
-  <!-- Login contra auth-service -->
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
-    <h2 class="text-lg font-semibold mb-4">Autenticacion (auth-service)</h2>
-    <form id="loginForm" class="flex flex-wrap gap-3 items-end">
-      <div>
-        <label class="block text-xs text-gray-400 mb-1">Usuario / email</label>
-        <input id="loginUser" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="admin@hospital.com" />
-      </div>
-      <div>
-        <label class="block text-xs text-gray-400 mb-1">Password</label>
-        <input id="loginPass" type="password" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="********" />
-      </div>
-      <button type="submit" class="bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-semibold px-4 py-2 rounded">
-        Iniciar sesion
-      </button>
-      <span id="loginResult" class="text-xs text-gray-400"></span>
+<!-- ============ LOGIN ============ -->
+<section id="loginView" class="hidden min-h-screen flex items-center justify-center px-4">
+  <div class="card w-full max-w-sm">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="h-10 w-10 rounded-lg bg-emerald-600 flex items-center justify-center text-xl font-bold">+</div>
+      <div><h1 class="font-bold text-lg leading-tight">Hospital Management</h1><p class="text-xs text-slate-400">Acceso al sistema</p></div>
+    </div>
+    <form id="loginForm" class="space-y-4">
+      <div><label class="block text-xs text-slate-400 mb-1">Usuario</label><input id="lUser" class="inp" autocomplete="username" required></div>
+      <div><label class="block text-xs text-slate-400 mb-1">Contraseña</label><input id="lPass" type="password" class="inp" autocomplete="current-password" required></div>
+      <div id="lErr" class="hidden text-sm text-red-400 bg-red-950/40 border border-red-900 rounded-lg px-3 py-2"></div>
+      <button id="lBtn" class="btn w-full">Iniciar sesión</button>
     </form>
-    <p class="text-xs text-gray-500 mt-2">
-      POST /api/auth/login &rarr; proxy hacia auth-service:8081. Ajustar el endpoint exacto segun AuthController.
-    </p>
   </div>
+</section>
 
-  <!-- Tarjetas de los 9 microservicios -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">auth-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Login / JWT &middot; puerto 8081</p>
-      <code class="text-xs text-emerald-400">/api/auth/*</code>
+<!-- ============ APP ============ -->
+<div id="appView" class="hidden">
+  <header class="sticky top-0 z-20 bg-slate-900/95 backdrop-blur border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold">+</div>
+        <span class="font-semibold hidden sm:block">Hospital<span class="text-emerald-400">MS</span></span>
+      </div>
+      <nav id="tabs" class="flex gap-1 overflow-x-auto"></nav>
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="text-right hidden md:block leading-tight">
+          <div id="uName" class="text-sm font-medium"></div><div id="uRole" class="text-xs text-emerald-400"></div>
+        </div>
+        <button id="logoutBtn" class="btn2">Salir</button>
+      </div>
     </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">user-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Perfiles de usuario &middot; puerto 8082</p>
-      <code class="text-xs text-emerald-400">/api/users/*</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">patient-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Pacientes &middot; puerto 8090</p>
-      <code class="text-xs text-emerald-400">/api/patients/*</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">doctor-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Doctores &middot; puerto 8091</p>
-      <code class="text-xs text-emerald-400">/api/doctors/*</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">appointment-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Citas medicas &middot; puerto 8092</p>
-      <code class="text-xs text-emerald-400">/api/appointments/*</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">billing-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Facturacion &middot; puerto 8085</p>
-      <code class="text-xs text-emerald-400">/api/invoices/*</code>
-      <a href="/facturas" class="block text-xs text-sky-400 mt-2 underline">Ver vista original &rarr;</a>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">pharmacy-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Farmacia / recetas &middot; puerto 8088 (antes 8085, re-mapeado)</p>
-      <code class="text-xs text-emerald-400">/api/pharmacy/*</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">notification-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Correo + eventos Kafka &middot; puerto 8087</p>
-      <code class="text-xs text-gray-500">Sin API REST propia (consumer-only)</code>
-    </div>
-
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 class="font-semibold text-white">report-analyst-service</h3>
-      <p class="text-xs text-gray-400 mt-1">Reportes / analitica &middot; puerto 8086</p>
-      <code class="text-xs text-emerald-400">/api/reports/*</code>
-      <a href="/reportes" class="block text-xs text-sky-400 mt-2 underline">Ver vista original &rarr;</a>
-    </div>
-
-  </div>
-
-  <p class="text-xs text-gray-600 mt-10">
-    eureka-server (8761) sigue activo internamente para el descubrimiento entre
-    microservicios (Feign), pero no es parte de la capa de presentacion.
-  </p>
+  </header>
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <div id="toast" class="hidden mb-4 text-sm rounded-lg px-4 py-3 border"></div>
+    <div id="panel"></div>
+  </main>
 </div>
 
 <script>
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const result = document.getElementById('loginResult');
-  result.textContent = 'Enviando...';
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: document.getElementById('loginUser').value,
-        password: document.getElementById('loginPass').value
-      })
-    });
-    result.textContent = res.ok ? 'OK (' + res.status + ')' : 'Error (' + res.status + ')';
-  } catch (err) {
-    result.textContent = 'No se pudo contactar auth-service: ' + err;
-  }
-});
-</script>
+/* ===================== Utilidades ===================== */
+const TK = 'hms_token', US = 'hms_user';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => n == null ? '—' : '$' + Number(n).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fdate = s => s ? new Date(s).toLocaleString('es-MX', {dateStyle: 'medium', timeStyle: 'short'}) : '—';
+const getToken = () => localStorage.getItem(TK);
 
+function tokenExpired() {
+  try {
+    const p = JSON.parse(atob(getToken().split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return p.exp && p.exp * 1000 < Date.now();
+  } catch (e) { return true; }
+}
+
+function toast(msg, ok = true) {
+  const t = $('toast');
+  t.className = 'mb-4 text-sm rounded-lg px-4 py-3 border ' + (ok
+    ? 'bg-emerald-950/40 border-emerald-800 text-emerald-300'
+    : 'bg-red-950/40 border-red-900 text-red-300');
+  t.textContent = msg;
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => t.classList.add('hidden'), 6000);
+}
+
+/* Cliente HTTP: añade Authorization: Bearer <token> en toda petición protegida */
+async function api(path, opt = {}) {
+  const headers = {'Accept': 'application/json'};
+  if (opt.body !== undefined) headers['Content-Type'] = 'application/json';
+  const tk = getToken();
+  if (tk && !opt.public) headers['Authorization'] = 'Bearer ' + tk;
+  let res;
+  try {
+    res = await fetch(path, {
+      method: opt.method || 'GET',
+      headers,
+      body: opt.body !== undefined ? JSON.stringify(opt.body) : undefined
+    });
+  } catch (e) { throw new Error('Sin conexión con el servidor'); }
+  const txt = await res.text();
+  let data = null;
+  try { data = txt ? JSON.parse(txt) : null; } catch (e) { data = txt; }
+  if (!res.ok) {
+    let m = (data && typeof data === 'object' && (data.message || data.error || data.detail)) ||
+            (typeof data === 'string' && data.length < 300 && data) || '';
+    if (res.status === 401) m = 'No autorizado: el servicio rechazó el token';
+    if (res.status === 403) m = 'Acceso denegado: tu rol no tiene permiso';
+    throw new Error((m || 'Error del servidor') + ' (HTTP ' + res.status + ')');
+  }
+  return data;
+}
+
+function table(cols, rows, empty) {
+  if (!rows || !rows.length) return `<p class="text-sm text-slate-500 py-8 text-center">${empty || 'Sin registros'}</p>`;
+  return `<div class="overflow-x-auto"><table class="w-full"><thead><tr>${cols.map(c => `<th>${c[0]}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr class="hover:bg-slate-900/60">${cols.map(c => `<td>${c[1](r)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+const loading = () => `<div class="card text-center text-slate-400 text-sm py-10">Cargando…</div>`;
+const failed = (e, fn) => `<div class="card border-red-900 text-center py-8"><p class="text-red-400 text-sm mb-4">${esc(e.message)}</p>
+  <button class="btn2" onclick="${fn}()">Reintentar</button></div>`;
+const head = (title, sub, extra = '') => `<div class="flex flex-wrap items-end justify-between gap-3 mb-5">
+  <div><h2 class="text-xl font-bold">${title}</h2><p class="text-sm text-slate-400">${sub}</p></div>${extra}</div>`;
+const badge = s => {
+  const m = {PENDING:'amber', CONFIRMED:'emerald', COMPLETED:'sky', CANCELLED:'red', PAGADA:'emerald', PENDIENTE:'amber', ANULADA:'red'};
+  const c = m[String(s).toUpperCase()] || 'slate';
+  return `<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-${c}-500/15 text-${c}-400 border border-${c}-500/30">${esc(s)}</span>`;
+};
+const field = (id, label, type = 'text', req = true, ph = '') =>
+  `<div><label class="block text-xs text-slate-400 mb-1">${label}</label><input id="${id}" type="${type}" class="inp" placeholder="${ph}" ${req ? 'required' : ''}></div>`;
+
+/* ===================== Sesión ===================== */
+function showLogin() {
+  $('appView').classList.add('hidden');
+  $('loginView').classList.remove('hidden');
+}
+function showApp() {
+  $('loginView').classList.add('hidden');
+  $('appView').classList.remove('hidden');
+  let u = {};
+  try { u = JSON.parse(localStorage.getItem(US) || '{}'); } catch (e) {}
+  $('uName').textContent = u.username || '';
+  $('uRole').textContent = (u.roles || []).map(r => r.replace('ROLE_', '')).join(', ');
+  go(location.hash.slice(1) in TABS ? location.hash.slice(1) : 'pacientes');
+}
+function logout(msg) {
+  localStorage.removeItem(TK);
+  localStorage.removeItem(US);
+  showLogin();
+  if (msg) { $('lErr').textContent = msg; $('lErr').classList.remove('hidden'); }
+}
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('lBtn');
+  btn.disabled = true; btn.textContent = 'Verificando…';
+  $('lErr').classList.add('hidden');
+  try {
+    const d = await api('/api/auth/login', {
+      method: 'POST', public: true,
+      body: {username: $('lUser').value.trim(), password: $('lPass').value}
+    });
+    if (!d || !d.token) throw new Error('El servidor no devolvió un token');
+    localStorage.setItem(TK, d.token);
+    localStorage.setItem(US, JSON.stringify({username: d.username, email: d.email, roles: d.roles}));
+    $('lPass').value = '';
+    showApp();
+  } catch (err) {
+    $('lErr').textContent = err.message.includes('HTTP 401') || err.message.includes('HTTP 403')
+      ? 'Usuario o contraseña incorrectos' : err.message;
+    $('lErr').classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Iniciar sesión'; }
+});
+$('logoutBtn').addEventListener('click', () => logout());
+
+/* ===================== Módulos ===================== */
+const TABS = {
+  pacientes:   ['Pacientes',     () => loadPatients()],
+  doctores:    ['Doctores',      () => loadDoctors()],
+  citas:       ['Citas',         () => loadAppointments()],
+  farmacia:    ['Farmacia',      () => loadPharmacy()],
+  facturacion: ['Facturación',   () => loadBilling()],
+  analitica:   ['Analítica',     () => loadReports()]
+};
+$('tabs').innerHTML = Object.entries(TABS).map(([k, v]) => `<button class="tab" data-t="${k}">${v[0]}</button>`).join('');
+$('tabs').addEventListener('click', e => { const t = e.target.closest('[data-t]'); if (t) go(t.dataset.t); });
+
+function go(k) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.t === k));
+  history.replaceState(null, '', '#' + k);
+  $('panel').innerHTML = loading();
+  TABS[k][1]();
+}
+
+/* ---- Pacientes (patient-service) ---- */
+async function loadPatients() {
+  try {
+    const rows = await api('/api/patients');
+    $('panel').innerHTML = head('Pacientes', rows.length + ' registrados') + `
+    <div class="grid lg:grid-cols-3 gap-5">
+      <div class="card lg:col-span-2">${table([
+        ['ID', r => r.id], ['Nombre', r => `<span class="font-medium">${esc(r.name)}</span>`],
+        ['Email', r => esc(r.email)], ['Teléfono', r => esc(r.phone || '—')]], rows, 'Aún no hay pacientes')}</div>
+      <form id="pForm" class="card space-y-3 h-fit">
+        <h3 class="font-semibold">Registrar paciente</h3>
+        ${field('pName', 'Nombre completo')}${field('pEmail', 'Email', 'email')}${field('pPhone', 'Teléfono', 'tel', false)}
+        <button class="btn w-full">Registrar</button>
+      </form>
+    </div>`;
+    $('pForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const b = e.target.querySelector('button'); b.disabled = true;
+      try {
+        await api('/api/patients', {method: 'POST', body: {
+          name: $('pName').value.trim(), email: $('pEmail').value.trim(), phone: $('pPhone').value.trim() || null}});
+        toast('Paciente registrado correctamente');
+        loadPatients();
+      } catch (err) { toast(err.message, false); b.disabled = false; }
+    });
+  } catch (e) { $('panel').innerHTML = failed(e, 'loadPatients'); }
+}
+
+/* ---- Doctores (doctor-service) ---- */
+async function loadDoctors() {
+  try {
+    const rows = await api('/api/doctors');
+    $('panel').innerHTML = head('Cuerpo médico', rows.length + ' doctores') + (rows.length
+      ? `<div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">${rows.map(d => `
+        <div class="card hover:border-emerald-700 transition">
+          <div class="h-12 w-12 rounded-full bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-lg mb-3">
+            ${esc((d.nombre || '?').replace(/^(dr|dra)\.?\s+/i, '').charAt(0).toUpperCase())}</div>
+          <h3 class="font-semibold">${esc(d.nombre)}</h3>
+          <p class="text-emerald-400 text-sm mb-3">${esc(d.especialidad)}</p>
+          <p class="text-xs text-slate-400 truncate">✉ ${esc(d.email || '—')}</p>
+          <p class="text-xs text-slate-400">☎ ${esc(d.telefono || '—')}</p>
+          <p class="text-xs text-slate-600 mt-2">ID ${d.id}</p>
+        </div>`).join('')}</div>`
+      : '<div class="card"><p class="text-sm text-slate-500 text-center py-8">No hay doctores registrados</p></div>');
+  } catch (e) { $('panel').innerHTML = failed(e, 'loadDoctors'); }
+}
+
+/* ---- Citas (appointment-service) ---- */
+async function loadAppointments() {
+  try {
+    const [pa, dr, ap] = await Promise.all([api('/api/patients'), api('/api/doctors'), api('/api/appointments')]);
+    const pn = Object.fromEntries(pa.map(p => [p.id, p.name]));
+    const dn = Object.fromEntries(dr.map(d => [d.id, d.nombre]));
+    const opt = (arr, lab) => arr.map(x => `<option value="${x.id}">${esc(lab(x))}</option>`).join('');
+    $('panel').innerHTML = head('Citas médicas', ap.length + ' citas agendadas') + `
+    <div class="grid lg:grid-cols-3 gap-5">
+      <div class="card lg:col-span-2">${table([
+        ['ID', r => r.id], ['Paciente', r => esc(pn[r.patientId] || '#' + r.patientId)],
+        ['Doctor', r => esc(dn[r.doctorId] || '#' + r.doctorId)], ['Fecha y hora', r => fdate(r.appointmentDateTime)],
+        ['Motivo', r => esc(r.reason || '—')], ['Estado', r => badge(r.status)]], ap, 'No hay citas')}</div>
+      <form id="aForm" class="card space-y-3 h-fit">
+        <h3 class="font-semibold">Agendar cita</h3>
+        <div><label class="block text-xs text-slate-400 mb-1">Paciente</label>
+          <select id="aPat" class="inp" required><option value="">Selecciona…</option>${opt(pa, p => p.name + ' · ' + p.email)}</select></div>
+        <div><label class="block text-xs text-slate-400 mb-1">Doctor</label>
+          <select id="aDoc" class="inp" required><option value="">Selecciona…</option>${opt(dr, d => d.nombre + ' · ' + d.especialidad)}</select></div>
+        ${field('aDate', 'Fecha y hora', 'datetime-local')}
+        ${field('aReason', 'Motivo', 'text', false, 'Consulta general')}
+        <div><label class="block text-xs text-slate-400 mb-1">Estado</label>
+          <select id="aStatus" class="inp"><option>PENDING</option><option>CONFIRMED</option><option>CANCELLED</option><option>COMPLETED</option></select></div>
+        <button class="btn w-full">Agendar cita</button>
+      </form>
+    </div>`;
+    $('aDate').min = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    $('aForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const b = e.target.querySelector('button'); b.disabled = true;
+      try {
+        await api('/api/appointments', {method: 'POST', body: {
+          patientId: Number($('aPat').value), doctorId: Number($('aDoc').value),
+          appointmentDateTime: $('aDate').value + ':00',
+          reason: $('aReason').value.trim() || null, status: $('aStatus').value}});
+        toast('Cita agendada correctamente');
+        loadAppointments();
+      } catch (err) { toast(err.message, false); b.disabled = false; }
+    });
+  } catch (e) { $('panel').innerHTML = failed(e, 'loadAppointments'); }
+}
+
+/* ---- Farmacia (pharmacy-service) ---- */
+async function loadPharmacy() {
+  try {
+    const rows = await api('/api/pharmacy/medicines');
+    $('panel').innerHTML = head('Farmacia', 'Inventario de medicamentos',
+      `<input id="mq" class="inp max-w-xs" placeholder="Buscar por nombre o código…">`) +
+      `<div class="card" id="mTable"></div>`;
+    const draw = q => {
+      const f = rows.filter(m => (m.name + ' ' + m.code).toLowerCase().includes(q.toLowerCase()));
+      $('mTable').innerHTML = table([
+        ['Código', r => `<code class="text-emerald-400">${esc(r.code)}</code>`],
+        ['Medicamento', r => `<span class="font-medium">${esc(r.name)}</span>`],
+        ['Descripción', r => `<span class="text-slate-400">${esc(r.description || '—')}</span>`],
+        ['Stock', r => `<span class="${r.stock <= 10 ? 'text-red-400 font-semibold' : ''}">${r.stock}</span>`],
+        ['Precio unit.', r => money(r.unitPrice)]], f, 'Sin resultados');
+    };
+    draw('');
+    $('mq').addEventListener('input', e => draw(e.target.value));
+  } catch (e) { $('panel').innerHTML = failed(e, 'loadPharmacy'); }
+}
+
+/* ---- Facturación (billing-service) ---- */
+async function loadBilling() {
+  const links = `<div class="flex gap-2"><a href="/facturas" target="_blank" class="btn">Vista original /facturas ↗</a>
+    <a href="/api/invoices" target="_blank" class="btn2">JSON /api/invoices ↗</a></div>`;
+  try {
+    const rows = await api('/api/invoices');
+    const total = rows.reduce((s, r) => s + Number(r.monto || 0), 0);
+    $('panel').innerHTML = head('Facturación', rows.length + ' facturas · total ' + money(total), links) +
+      `<div class="card">${table([
+        ['ID', r => r.id], ['Paciente', r => '#' + r.patientId], ['Expediente', r => '#' + r.medicalRecordId],
+        ['Concepto', r => esc(r.concepto)], ['Monto', r => `<span class="font-semibold">${money(r.monto)}</span>`],
+        ['Emisión', r => fdate(r.fechaEmision)], ['Estado', r => badge(r.estado)]], rows, 'No hay facturas')}</div>`;
+  } catch (e) {
+    $('panel').innerHTML = head('Facturación', 'Accesos directos', links) + failed(e, 'loadBilling');
+  }
+}
+
+/* ---- Analítica (report-analyst-service) ---- */
+async function loadReports() {
+  const links = `<div class="flex gap-2"><a href="/reportes" target="_blank" class="btn">Vista original /reportes ↗</a>
+    <a href="/api/reports/summary" target="_blank" class="btn2">JSON /api/reports ↗</a></div>`;
+  try {
+    const s = await api('/api/reports/summary');
+    const kpi = (l, v, c = 'emerald') => `<div class="card"><p class="text-xs uppercase tracking-wide text-slate-400">${l}</p>
+      <p class="text-2xl font-bold mt-1 text-${c}-400">${v}</p></div>`;
+    const est = Object.entries(s.citasPorEstado || {});
+    $('panel').innerHTML = head('Analítica', 'Resumen consolidado del hospital', links) + `
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+        ${kpi('Ingresos totales', money(s.ingresosTotales))}
+        ${kpi('Facturas', s.totalFacturas, 'sky')}
+        ${kpi('Promedio / factura', money(s.ingresoPromedioPorFactura), 'sky')}
+        ${kpi('Citas', s.totalCitas, 'amber')}
+        ${kpi('Pacientes registrados', s.totalPacientesRegistrados)}
+        ${kpi('Recetas emitidas', s.totalRecetasEmitidas, 'amber')}
+        ${kpi('Expedientes médicos', s.totalExpedientesMedicos ?? 'N/D', 'slate')}
+      </div>
+      <div class="card"><h3 class="font-semibold mb-3">Citas por estado</h3>${est.length
+        ? est.map(([k, v]) => `<div class="flex items-center gap-3 mb-2"><span class="w-28 text-sm">${badge(k)}</span>
+            <div class="flex-1 bg-slate-800 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width:${s.totalCitas ? Math.round(v / s.totalCitas * 100) : 0}%"></div></div>
+            <span class="text-sm w-8 text-right">${v}</span></div>`).join('')
+        : '<p class="text-sm text-slate-500">Sin datos todavía</p>'}</div>`;
+  } catch (e) {
+    $('panel').innerHTML = head('Analítica', 'Accesos directos', links) + failed(e, 'loadReports');
+  }
+}
+
+/* ===================== Arranque ===================== */
+if (getToken() && !tokenExpired()) showApp(); else { logout(getToken() ? 'Tu sesión expiró, inicia sesión de nuevo' : ''); }
+</script>
 </body>
 </html>
