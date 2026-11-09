@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hospital Management System - Panel Local</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+<div class="max-w-6xl mx-auto px-4 py-10">
+
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-white">Hospital Management System</h1>
+    <p class="text-gray-400 text-sm mt-1">
+      Panel unico local &middot; Imagen 3 (Frontend) &rarr; Imagen 2 (Backend, 9 microservicios) &rarr; Imagen 1 (PostgreSQL)
+    </p>
+    <span class="inline-flex items-center gap-2 bg-amber-900/30 text-amber-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-amber-700/50 mt-3">
+      Stub generado: no se proporciono codigo de frontend en los 5 paquetes recibidos
+    </span>
+  </div>
+
+  <!-- Login contra auth-service -->
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-8">
+    <h2 class="text-lg font-semibold mb-4">Autenticacion (auth-service)</h2>
+    <form id="loginForm" class="flex flex-wrap gap-3 items-end">
+      <div>
+        <label class="block text-xs text-gray-400 mb-1">Usuario / email</label>
+        <input id="loginUser" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="admin@hospital.com" />
+      </div>
+      <div>
+        <label class="block text-xs text-gray-400 mb-1">Password</label>
+        <input id="loginPass" type="password" class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm" placeholder="********" />
+      </div>
+      <button type="submit" class="bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-semibold px-4 py-2 rounded">
+        Iniciar sesion
+      </button>
+      <span id="loginResult" class="text-xs text-gray-400"></span>
+    </form>
+    <p class="text-xs text-gray-500 mt-2">
+      POST /api/auth/login &rarr; proxy hacia auth-service:8081. Ajustar el endpoint exacto segun AuthController.
+    </p>
+  </div>
+
+  <!-- Tarjetas de los 9 microservicios -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">auth-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Login / JWT &middot; puerto 8081</p>
+      <code class="text-xs text-emerald-400">/api/auth/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">user-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Perfiles de usuario &middot; puerto 8082</p>
+      <code class="text-xs text-emerald-400">/api/users/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">patient-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Pacientes &middot; puerto 8090</p>
+      <code class="text-xs text-emerald-400">/api/patients/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">doctor-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Doctores &middot; puerto 8091</p>
+      <code class="text-xs text-emerald-400">/api/doctors/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">appointment-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Citas medicas &middot; puerto 8092</p>
+      <code class="text-xs text-emerald-400">/api/appointments/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">billing-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Facturacion &middot; puerto 8085</p>
+      <code class="text-xs text-emerald-400">/api/invoices/*</code>
+      <a href="/facturas" class="block text-xs text-sky-400 mt-2 underline">Ver vista original &rarr;</a>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">pharmacy-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Farmacia / recetas &middot; puerto 8088 (antes 8085, re-mapeado)</p>
+      <code class="text-xs text-emerald-400">/api/pharmacy/*</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">notification-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Correo + eventos Kafka &middot; puerto 8087</p>
+      <code class="text-xs text-gray-500">Sin API REST propia (consumer-only)</code>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+      <h3 class="font-semibold text-white">report-analyst-service</h3>
+      <p class="text-xs text-gray-400 mt-1">Reportes / analitica &middot; puerto 8086</p>
+      <code class="text-xs text-emerald-400">/api/reports/*</code>
+      <a href="/reportes" class="block text-xs text-sky-400 mt-2 underline">Ver vista original &rarr;</a>
+    </div>
+
+  </div>
+
+  <p class="text-xs text-gray-600 mt-10">
+    eureka-server (8761) sigue activo internamente para el descubrimiento entre
+    microservicios (Feign), pero no es parte de la capa de presentacion.
+  </p>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const result = document.getElementById('loginResult');
+  result.textContent = 'Enviando...';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('loginUser').value,
+        password: document.getElementById('loginPass').value
+      })
+    });
+    result.textContent = res.ok ? 'OK (' + res.status + ')' : 'Error (' + res.status + ')';
+  } catch (err) {
+    result.textContent = 'No se pudo contactar auth-service: ' + err;
+  }
+});
+</script>
+
+</body>
+</html>

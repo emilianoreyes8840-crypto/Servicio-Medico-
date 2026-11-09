@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturas - Billing Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+<div class="max-w-6xl mx-auto px-4 py-10">
+
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-white">Facturas</h1>
+            <p class="text-gray-400 text-sm mt-1">billing-service &middot; Hospital Management System</p>
+        </div>
+        <span class="inline-flex items-center gap-2 bg-emerald-900/40 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-700/50">
+            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+            billing_db conectado
+        </span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 mb-5">
+        <a href="/facturas"
+           th:classappend="${filtroEstado == ''} ? 'bg-indigo-600 text-white' : 'bg-gray-900 text-gray-400 border border-gray-800 hover:bg-gray-800'"
+           class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors">Todas</a>
+        <a href="/facturas?estado=PENDIENTE"
+           th:classappend="${filtroEstado == 'PENDIENTE'} ? 'bg-amber-600 text-white' : 'bg-gray-900 text-gray-400 border border-gray-800 hover:bg-gray-800'"
+           class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors">Pendientes</a>
+        <a href="/facturas?estado=PAGADA"
+           th:classappend="${filtroEstado == 'PAGADA'} ? 'bg-emerald-600 text-white' : 'bg-gray-900 text-gray-400 border border-gray-800 hover:bg-gray-800'"
+           class="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors">Pagadas</a>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-xl">
+        <table class="min-w-full divide-y divide-gray-800 text-sm">
+            <thead class="bg-gray-800/60">
+            <tr>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">ID</th>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">Paciente</th>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">Concepto</th>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">Monto</th>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">Fecha</th>
+                <th class="px-5 py-3 text-left font-semibold text-gray-300 uppercase tracking-wide text-xs">Estado</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+            <tr th:each="invoice : ${invoices}" class="hover:bg-gray-800/40 transition-colors">
+                <td class="px-5 py-3 font-mono text-gray-400" th:text="${invoice.id}">1</td>
+                <td class="px-5 py-3" th:text="'Paciente #' + ${invoice.patientId}">Paciente #1</td>
+                <td class="px-5 py-3 text-gray-200" th:text="${invoice.concepto}">Consulta General</td>
+                <td class="px-5 py-3 font-semibold text-emerald-400"
+                    th:text="'$' + ${#numbers.formatDecimal(invoice.monto, 1, 2)}">$450.00</td>
+                <td class="px-5 py-3 text-gray-400"
+                    th:text="${#temporals.format(invoice.fechaEmision, 'dd/MM/yyyy HH:mm')}">23/10/2026 10:00</td>
+                <td class="px-5 py-3">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                              th:classappend="${invoice.estado == 'PENDIENTE'} ? 'bg-amber-900/40 text-amber-400 border border-amber-700/50' : 'bg-emerald-900/40 text-emerald-400 border border-emerald-700/50'"
+                              th:text="${invoice.estado}">PENDIENTE</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(invoices)}">
+                <td colspan="6" class="px-5 py-8 text-center text-gray-500">No hay facturas registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="text-xs text-gray-600 mt-6">Vista generada por Thymeleaf &middot; datos desde billing_db (PostgreSQL)</p>
+    <p class="text-xs text-gray-600 mt-1">API JSON completa: <code>GET /api/invoices</code></p>
+</div>
+
+</body>
+</html>

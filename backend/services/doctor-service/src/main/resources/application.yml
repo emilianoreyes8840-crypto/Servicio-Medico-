@@ -1,0 +1,37 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: doctor-service
+  datasource:
+    # MIGRADO: antes jdbc:mariadb://doctor-db:3306/doctor_db (motor MariaDB).
+    # Ahora apunta al Postgres unificado (Imagen 1); host/usuario/password se
+    # sobreescriben via variables de entorno en docker-compose.yml.
+    url: jdbc:postgresql://db:5432/doctor_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # CORRECCION: esta clave traia un "!" extra al final que NO existe
+          # en auth-service ni en patient-service. Con claves distintas,
+          # doctor-service rechazaba (401) cualquier JWT emitido por
+          # auth-service. Se iguala byte a byte a la clave real.
+          secret-key: "${JWT_SECRET:aG9zcGl0YWwtbWFuYWdlbWVudC1zeXN0ZW0tYXV0aC1zZXJ2aWNlLWp3dC1zZWNyZXQta2V5LTIwMjYtY2hhbmdlLW1l}"
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka/}
+  instance:
+    prefer-ip-address: true

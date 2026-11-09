@@ -1,0 +1,39 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: hospital
+    password: hospital123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Clave HS256 codificada en Base64 (mínimo 256 bits). Sobrescribir con la variable de entorno JWT_SECRET en producción.
+  secret: ${JWT_SECRET:aG9zcGl0YWwtbWFuYWdlbWVudC1zeXN0ZW0tYXV0aC1zZXJ2aWNlLWp3dC1zZWNyZXQta2V5LTIwMjYtY2hhbmdlLW1l}
+  expiration-ms: 86400000
+app:
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    email: ${ADMIN_EMAIL:admin@hospital.com}
+    password: ${ADMIN_PASSWORD:Admin12345}
